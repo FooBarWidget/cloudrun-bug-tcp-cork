@@ -1,4 +1,4 @@
-This is a sample which demonstrates a bug TCP\_CORK in Google Cloud Run.
+This is a sample which demonstrates a TCP\_CORK bug in Google Cloud Run.
 
 Some HTTP servers — notably Ruby's [Puma](https://github.com/puma/puma) — optimize throughput by enabling TCP\_CORK on a client socket when writing a response. They only turn off TCP\_CORK when the response is complete.
 
