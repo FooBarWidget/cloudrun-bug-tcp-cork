@@ -12,9 +12,11 @@ The sample contains a simple custom-written HTTP 1.1 server, implemented in Ruby
 
 When you call the `/events` path, it responds with a Server Sent Events stream that lasts for 5 seconds. Every 1 second, it sends an event containing a number.
 
-### Setup
+### Setup (optional)
 
-Deploy this sample to Google Cloud Run:
+You can use the sample that I've already deployed on `https://cloudrun-bug-tcp-cork-true-f7awo4fcoa-uk.a.run.app/events`.
+
+Or, if you want to deploy the sample yourself to Google Cloud Run:
 
 ~~~bash
 gcloud run deploy \
@@ -27,15 +29,15 @@ gcloud run deploy \
 	--region=us-east4 \
 	--concurrency=1 \
 	--set-env-vars=CORK=true \
-	cloudrun-bug-tcp-cork
+	cloudrun-bug-tcp-cork-true
 ~~~
 
 ### Test
 
-Send a request to the sample...
+Send a request to the deployed sample...
 
 ~~~bash
-curl -v https://cloudrun-bug-tcp-cork-f7awo4fcoa-uk.a.run.app/events
+curl -v https://cloudrun-bug-tcp-cork-true-f7awo4fcoa-uk.a.run.app/events
 ~~~
 
 ...and observe that it doesn't send events in real-time, but instead buffers all events until the request ends after 5 seconds.
@@ -68,6 +70,12 @@ $ curl -v http://127.0.0.1:9292/events
 
 ### Reproducing expected behavior on Google Cloud Run with TCP\_CORK disabled
 
+The sample HTTP server will not cork sockets if we set the `CORK=false` environment variable.
+
+I've deployed an instance that has corking disabled, on this address: `https://cloudrun-bug-tcp-cork-false-f7awo4fcoa-uk.a.run.app/events`.
+
+Or, if you want to deploy it yourself:
+
 ~~~bash
 gcloud run deploy \
 	--platform=managed \
@@ -79,12 +87,18 @@ gcloud run deploy \
 	--region=us-east4 \
 	--concurrency=1 \
 	--set-env-vars=CORK=false \
-	cloudrun-bug-tcp-cork
+	cloudrun-bug-tcp-cork-false
 ~~~
 
 We can see events being streamed in real-time:
 
 ~~~
-$ curl -v https://cloudrun-bug-tcp-cork-f7awo4fcoa-uk.a.run.app/events
+$ curl -v https://cloudrun-bug-tcp-cork-false-f7awo4fcoa-uk.a.run.app/events
 ...events being streamed...
 ~~~
+
+### Additional remarks
+
+*All* TCP sockets are affected, not just the HTTP client socket. So suppose that the container runs an Nginx reverse proxy, proxying to an app running on the same container but on another port. If the app sets TCP\_CORK on its HTTP client socket, then Nginx doesn't receive any response data until the app uncorks the socket.
+
+Thus, this appears to be a kernel-level problem, rather than a network-level problem.
