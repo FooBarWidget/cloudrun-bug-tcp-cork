@@ -1,0 +1,3 @@
+#!/bin/sh
+set -ex
+docker run -ti --rm -p 9292:9292 gcr.io/fullstaq-ruby/cloudrun-bug-tcp-cork

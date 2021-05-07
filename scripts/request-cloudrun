@@ -1,0 +1,3 @@
+#!/bin/sh
+set -ex
+curl --http1.1 -v https://ssetest-ruby-f7awo4fcoa-uk.a.run.app/events
