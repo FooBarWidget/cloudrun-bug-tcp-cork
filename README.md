@@ -26,6 +26,7 @@ gcloud run deploy \
 	--allow-unauthenticated \
 	--region=us-east4 \
 	--concurrency=1 \
+	--set-env-vars=CORK=true \
 	cloudrun-bug-tcp-cork
 ~~~
 
@@ -84,6 +85,6 @@ gcloud run deploy \
 We can see events being streamed in real-time:
 
 ~~~
-$ curl -v http://127.0.0.1:9292/events
+$ curl -v https://cloudrun-bug-tcp-cork-f7awo4fcoa-uk.a.run.app/events
 ...events being streamed...
 ~~~
