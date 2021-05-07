@@ -2,7 +2,7 @@ This is a sample which demonstrates a TCP\_CORK bug in Google Cloud Run.
 
 Some HTTP servers — notably Ruby's [Puma](https://github.com/puma/puma) — optimize throughput by enabling TCP\_CORK on a client socket when writing a response. They only turn off TCP\_CORK when the response is complete.
 
-[Server Sent Events](https://en.wikipedia.org/wiki/Server-sent_events) stream data to the client as events occur. There is normally no big problem combining TCP\_CORK with Server Sent Events, because according to Linux's ([man 7 tcp](https://man7.org/linux/man-pages/man7/tcp.7.html)), TCP\_CORK only corks output for at most 200ms.
+[Server Sent Events](https://en.wikipedia.org/wiki/Server-sent_events) stream data to the client as events occur. There is normally no big problem combining TCP\_CORK with Server Sent Events, because according to Linux's [man 7 tcp](https://man7.org/linux/man-pages/man7/tcp.7.html), TCP\_CORK only corks output for at most 200ms.
 
 However, Google Cloud Run's environment doesn't put a time limit on corking. Instead, it corks until the socket is uncorked.
 
